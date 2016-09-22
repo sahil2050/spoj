@@ -1,96 +1,72 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int const N=100000;
-int t[2*N+1][4]; // 0 -> most freq value 1-> count of that value 3-> left value of interval 4-> right value of interval
-int n;
+#define Q struct Query 
 
+int const MAX=1e5;
+int const N=2*MAX+1;
+int t[2*N];
+int A[MAX+1],ans[MAX+1];
+int n,q;
+int sqrt_n;
 
-void build(){
-    for(int i=n-1;i>0;i--){
-        if(t[i<<1][0]==t[i<<1|1][0]){
-            t[i][0]=t[i<<1][0];
-            t[i][1]=t[i<<1][1]+t[i<<1|1][1];
-        }
-        else if(t[t[i<<1][3]][0]!=t[t[i<<1|1][2]][0]){
-            if(t[i<<1][1]>t[i<<1|1][1]){
-                t[i][0]=t[i<<1][0];
-                t[i][1]=t[i<<1][1];
-            }
-            else{
-                t[i][0]=t[i<<1|1][0];
-                t[i][1]=t[i<<1][1];
-            }
-        }
-        else{
-            if(t[i<<1][0]==t[t[i<<1][3]][0]){
-                int count=t[i<<1][1];
-                int j=t[i>>1|1][2]+n;
-                while(t[j][0]==t[i<<1][0]&&j<2*n){
-                    j++;
-                    count++;
-                }
-                if(count>t[i<<1|1][1]){
-                    t[i][0]=t[i<<1][0];
-                    t[i][1]=count;
-                }
-                else{
-                    t[i][0]=t[i<<1|1][0];
-                    t[i][0]=t[i<<1|1][1];
-                }
-            }
-            else if(t[i<<1|1][0]==t[t[i<<1|1][2]][0]){
-                int count=t[i<<1|1][1];
-                int j=t[i>>1][3]+n;
-                while(t[j][0]==t[i<<1|1][0]&&j>=n){
-                    count++;
-                    j--;
-                }
-                if()
-            }
-            else{
-            
-            }
-        }
-        t[i][2]=t[i<<1][2];
-        t[i][3]=t[i<<1|1][3];
-    }
+void update(int pos,int val){
+    for(t[pos+=N]+=val;pos>1;pos>>=1)
+        t[pos>>1]=max(t[pos],t[pos^1]);
 }
 
-int query(int l,int r){
-    l+=n,r+=n;
-    int l[2]={0,0},r[2]={0,0};
-    while(;l<r;l>>=1,r>>=1){
-        if(l&1){
-            
-            l++;
-        }
-        if(r&1){
-            --r;
-
-        }
+int query(int l,int r){  // [l,r)
+    l+=N,r+=N;
+    int lmax=0,rmax=0;
+    for(;l<r;l>>=1,r>>=1){
+        if(l&1)lmax=max(lmax,t[l]);
+        if(r&1)rmax=max(rmax,t[r]);
     }
+    return max(lmax,rmax);
+}
 
+struct Query{
+    int l,r,pos;
+    Query(int L=0,int R=0,int p=0){
+        l=L,r=R,pos=p;
+    }
+};
+
+bool comp(Q q1,Q q2){   //sqrt decomposition
+    if(q1.l/sqrt_n<q2.l/sqrt_n)return 1;
+    if(q1.l/sqrt_n>q2.l/sqrt_n)return 0;
+    return (q1.r<q2.r);
 }
 
 int main(){
-    int t;cin>>t;
-    while(t--){
-        memset(t,0,sizeof(t));
-        cin>>n;
-        for(int i=0;i<n;i++){
-            scanf("%d",&t[n+i][0]);
-            t[n+i][1]=1;
-            t[n+i][2]=t[n+i][3]=i;
-        }
-
-        build();
-
-        int q;cin>>q;
-        while(q--){
-            int l,r;
-            scanf("%d %d",&l,&r);
-            printf("%d\n",query(--l,r));
-        }
+    memset(t,0,sizeof(t));
+    scanf("%d",&n);if(n==0)return 0;
+    scanf("%d",&q);
+    sqrt_n=floor(sqrt(n));
+    for(int i=0;i<n;i++){scanf("%d",&A[i]);A[i]+=MAX;}
+    Q queries[q];
+    for(int i=0;i<q;i++){
+        int l,r;scanf("%d %d",&l,&r);
+        queries[i]=Query(--l,r,i);
     }
+    sort(queries,queries+q,comp);
+    int l=0,r=0;
+    for(int i=0;i<q;i++){ //process queries
+        while(l<queries[i].l){
+            update(A[l],-1);l++;
+        }
+        while(l>queries[i].l){
+            l--;update(A[l],1);
+        }
+        while(r<queries[i].r){
+            update(A[r],1);r++;
+        }
+        while(r>queries[i].r){
+            r--;update(A[r],-1);
+        }
+        ans[queries[i].pos]=query(0,N);
+    }
+    for(int i=0;i<q;i++)
+        printf("%d\n",ans[i]);
+    return main();
 }

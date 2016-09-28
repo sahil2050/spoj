@@ -2,8 +2,7 @@
 using namespace std;
 
 int main(){
-    int n,m;
-    cin>>n>>m;
+    int n,m;scanf("%d %d",&n,&m);
     vector< set <int> > graph;
     for(int i=0;i<n;i++){
         set<int> s;
@@ -11,13 +10,11 @@ int main(){
     }
     
     for(int i=0;i<m;i++){
-        int u,k;
-        cin>>u>>k;
+        int u,k;scanf("%d %d",&u,&k);
         u--;
         while(k--){
             int v;cin>>v;
-            v--;
-            graph[v].insert(u);
+            graph[--v].insert(u);
         }
     }
 
@@ -25,23 +22,17 @@ int main(){
     vector<int> ans_vec;
     while(ans.size()<n){
         int d[n];
-        for(int i=0;i<n;i++)
-            d[i]=0;
+        memset(d,0,sizeof(d));
         for(int i=0;i<n;i++){
             for(set<int>::iterator it=graph[i].begin();it!=graph[i].end();it++)
                 d[*it]++;
         }
-        //for(int i=0;i<n;i++)
-        //    cout<<d[i]<< " ";
-        //cout<<endl;
         int i=0;
-        while(d[i]!=0 || ans.find(i)!=ans.end())
-            i++;
+        while(d[i]!=0 || ans.find(i)!=ans.end())i++;
         ans.insert(i);
         ans_vec.push_back(i);
         graph[i].clear();
     }
 
-    for(int i=0;i<n;i++)
-        cout<<++ans_vec[i]<<" ";
+    for(int i=0;i<n;i++)printf("%d ",++ans_vec[i]);
 }

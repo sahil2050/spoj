@@ -32,18 +32,21 @@ void relax(){
         s.pb(temp);
         relax();
     }
+    return;
 }
 
 int main(){
+    while(1){
     s.clear(),ans=0;
     ll n;scanf("%lld",&n);
-    if(n==0)return 0;
+    if(n==0)break;
     for(ll i=0;i<n;i++){
-        ll m=s.size()-1,temp;
+        ll m,temp;
+        m=(ll)s.size()-1;
         scanf("%lld",&temp);
         if(temp!=0)s.pb(ii(temp,i));
         if(m>=0 && s[m].ff*temp<0)relax();
     }
     printf("%lld\n",ans);
-    return main();
+    }
 }

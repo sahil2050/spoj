@@ -1,73 +1,73 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define  pb push_back
+#define ll long long
+#define ii pair<ll,ll>
+#define vii vector<ii>
 #define ff first
 #define ss second
+#define pb push_back
 
-int const mod = 1e9+7;
-int const N=100000;
-typedef long long ll;
-typedef pair<ll,ll> ii;
-typedef vector<ii> vii;
+int const N=1e5+10;
+int const mod=1e9+7;
+vii G[N];
+int n,p[N],root;
+ll ans[N],dp[N];
 
-vector<vii> graph;
-ll p[N];
-int n,root=0;
-ll dp[N][2];
+void dfs(ll u){
+    for(int i=0;i<G[u].size();i++){
+        int v=G[u][i].ff;
+        if(v!=root && p[v]==-1){
+            p[v]=u;
+            dfs(v);
+        }
+    }
+}
 
-void solve(int u){
-    if(dp[u][0]!=-1)return ;
-    dp[u][0]=1,dp[u][1]=1;
-    for(int i=0;i<graph[u].size();i++){
-        int v=graph[u][i].ff,w=graph[u][i].ss;
+ll combine(vector<ll> A){
+    if(A.size()==0)return 0;
+    ll sum=0,sumsq=0;
+    for(int i=0;i<A.size();i++){
+        sum+=A[i],sumsq+=A[i]*A[i];
+        sum%=mod,sumsq%=mod;
+    }
+    ll ret = ((sum*sum-sumsq)%mod+mod)%mod;
+    ll two_inv=500000004;
+    ret=(ret*two_inv)%mod;
+    return (ret+sum)%mod;
+}
+
+void solve(ll u){
+    dp[u]=1;
+    vector<ll> A;
+    for(int i=0;i<G[u].size();i++){
+        ll v=G[u][i].ff,w=G[u][i].ss;
         if(v!=p[u]){
             solve(v);
-            dp[u][0]+=(w*dp[v][1])%mod;
-            dp[u][1]+=(w*dp[v][1])%mod;
-            dp[u][0]%=mod,dp[u][1]%=mod;
-            for(int j=0;j<i;j++){
-                int v2=graph[u][j].ff,w2=graph[u][j].ss;
-                if(v2!=p[u]){
-                    solve(v2);
-                    dp[u][0]+=((w*dp[v][1])%mod)*((w2*dp[v2][1])%mod)%mod;
-                    dp[u][0]%=mod;
-                }
-            }
+            A.pb(dp[v]*w%mod);
+            dp[u]+=dp[v]*w;
+            dp[u]%=mod;
         }
-    } 
+    }
+    ans[u]=combine(A);
 }
 
 int main(){
     scanf("%d",&n);
-    for(int i=0;i<n;i++){
-        vii temp;graph.pb(temp);
-    }
     for(int i=0;i<n-1;i++){
-        ll u,v,w;scanf("%lld %lld %lld",&u,&v,&w);
+        ll u,v,w;
+        scanf("%lld %lld %lld",&u,&v,&w);
         u--,v--;
-        graph[u].pb(ii(v,w));
-        graph[v].pb(ii(u,w));
+        G[u].pb(ii(v,w));
+        G[v].pb(ii(u,w));
     }
-    
     memset(p,-1,sizeof(p));
-    stack<ll> s;
-    s.push(root);
-    while(!s.empty()){
-        int u=s.top();
-        s.pop();
-        for(int i=0;i<graph[u].size();i++){
-            int v=graph[u][i].ff;
-            if(p[v]==-1&&v!=root){
-                s.push(v);
-                p[v]=u;
-            }
-        }
+    dfs(root=0);
+    solve(0);
+    ll x=0;
+    for(int i=0;i<n;i++){
+        x+=ans[i];
+        x%=mod;
     }
-    
-    memset(dp,-1,sizeof(dp));
-    solve(root);
-    ll ans=0;
-    for(int i=0;i<n;i++)ans+=dp[i][0];
-    printf("%lld",(ans-n+mod)%mod);
+    printf("%lld\n",x);
 }

@@ -1,7 +1,7 @@
-//  Author           :   Sahil Aggarwal
+//  Author          :  Sahil Aggarwal
 //
 //  Problem Name	:   MaxFlow 
-//  Project Name    :   Learning
+//  Project Name    :   MTL342 Assignment
 //  Date            :   01/11/2016
 //
 //  Algorithm       :   Ford Fulkerson and Edmond Karp Algorithm
@@ -20,7 +20,7 @@ int const inf =1e9;
 vector<int> G[N];
 int M[N][N];
 int P[N]; // parent array
-int n,m,source,sink,maxflow; // no of vertices and edges respectively and sorce,sink
+int n,m,source,sink; // no of vertices and edges respectively and sorce,sink
 
 bool dfs(){
 	memset(P,-1,sizeof(P));
@@ -61,7 +61,7 @@ bool bfs(){
 }
 
 int maxFlow(int flag){ // 0-> ford fulkerson; 1-> edmond karp
-	maxflow = 0;
+	int maxflow = 0;
 	while(1){
 		bool cont;
 		if(flag == 0)cont = dfs();
@@ -82,6 +82,7 @@ int maxFlow(int flag){ // 0-> ford fulkerson; 1-> edmond karp
 	}
 	return maxflow;
 }
+
 int main(){
 	printf("Enter no of vertices and edges\n");
 	scanf("%d %d",&n,&m);
